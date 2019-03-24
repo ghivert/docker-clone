@@ -2,9 +2,10 @@ require "yaml"
 require "optparse"
 require "pathname"
 
-DESCRIPTION  = "The path to your docker pull config file."
-SHORT_OPTION = "-c"
-LONG_OPTION  = "--config config_file_path"
+CONFIG_DESCRIPTION  = "Path to your docker pull config file"
+HELP_DESCRIPTION    = "Show this help message"
+
+HELP_BANNER = "Usage: docker-pull [options]"
 
 DEFAULT_WORKING_DIR = "./"
 
@@ -31,22 +32,47 @@ class DockerPull
     options = { config_path: "docker-pull.yml" }
     options.tap do |options|
       OptionParser.new do |parser|
-        parser.on(SHORT_OPTION, LONG_OPTION, DESCRIPTION) do |config_path|
+        parser.banner = HELP_BANNER
+        parser.separator ""
+        parser.on("-h", "--help", HELP_DESCRIPTION) do
+          puts parser
+          exit(true)
+        end
+        parser.on("-c", "--config config_file_path", CONFIG_DESCRIPTION) do |config_path|
           options[:config_path] = config_path
         end
-      end.parse
+      end.parse!
     end
   end
 
-  def read_docker_file(pathname)
+  def full_path(pathname)
     path = Pathname.new(pathname)
-    file = File.read(path.expand_path)
+    path.expand_path
+  end
+
+  def read_docker_file(pathname)
+    path = full_path(pathname)
+    file = File.read(path)
     YAML.load(file)
+  end
+
+  def print_docker_pull_error(path)
+    puts "No corresponding config file, looking for #{path}"
+  end
+
+  def print_docker_pull_error_and_exit
+    config_path      = @@options[:config_path]
+    full_config_path = full_path(config_path)
+
+    print_docker_pull_error(full_config_path)
+    exit(false)
   end
 
   def get_config
     @@options     ||= parse_options
     @@docker_pull ||= read_docker_file(@@options[:config_path])
+  rescue
+    print_docker_pull_error_and_exit
   end
 
   def clone_repo(repo)
