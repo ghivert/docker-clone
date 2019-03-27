@@ -2,12 +2,12 @@ require "yaml"
 require "optparse"
 require "pathname"
 
-CONFIG_DESCRIPTION  = "Path to your docker pull config file"
+CONFIG_DESCRIPTION  = "Path to your docker clone config file"
 HELP_DESCRIPTION    = "Show this help message"
 
-HELP_BANNER = "Usage: docker-pull [options]"
+HELP_BANNER = "Usage: docker-clone [options]"
 
-DEFAULT_WORKING_DIR = "./"
+DEFAULT_WORKING_DIR = "../"
 
 class NoRepoException < Exception
 end
@@ -20,7 +20,7 @@ class DockerClone
   def clone_repos
     working_dir = @@options[:working_dir] || DEFAULT_WORKING_DIR
     Dir.chdir(working_dir) do
-      @@docker_pull["repos"].each do |repo|
+      @@docker_clone["repos"].each do |repo|
         clone_repo(repo)
       end
     end
@@ -29,7 +29,7 @@ class DockerClone
   private
 
   def parse_options
-    options = { config_path: "docker-pull.yml" }
+    options = { config_path: "docker-clone.yml" }
     options.tap do |options|
       OptionParser.new do |parser|
         parser.banner = HELP_BANNER
@@ -56,23 +56,23 @@ class DockerClone
     YAML.load(file)
   end
 
-  def print_docker_pull_error(path)
+  def print_docker_clone_error(path)
     puts "No corresponding config file, looking for #{path}"
   end
 
-  def print_docker_pull_error_and_exit
+  def print_docker_clone_error_and_exit
     config_path      = @@options[:config_path]
     full_config_path = full_path(config_path)
 
-    print_docker_pull_error(full_config_path)
+    print_docker_clone_error(full_config_path)
     exit(false)
   end
 
   def get_config
-    @@options     ||= parse_options
-    @@docker_pull ||= read_docker_file(@@options[:config_path])
+    @@options      ||= parse_options
+    @@docker_clone ||= read_docker_file(@@options[:config_path])
   rescue
-    print_docker_pull_error_and_exit
+    print_docker_clone_error_and_exit
   end
 
   def clone_repo(repo)
