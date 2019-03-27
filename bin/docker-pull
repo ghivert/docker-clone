@@ -1,4 +1,0 @@
-#! /usr/bin/env ruby
-require "docker_pull"
-
-DockerPull.new.clone_repos

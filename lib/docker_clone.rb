@@ -12,7 +12,7 @@ DEFAULT_WORKING_DIR = "./"
 class NoRepoException < Exception
 end
 
-class DockerPull
+class DockerClone
   def initialize
     get_config
   end
