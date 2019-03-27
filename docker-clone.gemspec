@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
-  s.name        = "docker_clone"
-  s.version     = "0.0.0"
+  s.name        = "docker-clone"
+  s.version     = "0.1.0"
   s.date        = "2019-03-24"
   s.summary     = "Get all your dockers repos"
   s.description = "Get all your dockers repos"
