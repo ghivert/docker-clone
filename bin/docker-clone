@@ -1,4 +1,33 @@
 #! /usr/bin/env ruby
 require "docker_clone"
+require "optparse"
 
-DockerClone.new.clone_repos
+HELP_BANNER         = "Usage: docker-clone [options]"
+HELP_DESCRIPTION    = "Show this help message"
+CONFIG_DESCRIPTION  = "Path to your docker clone config file"
+
+def parse_options
+  options = { config_file_path: "docker-clone.yml" }
+  options.tap do |options|
+    OptionParser.new do |parser|
+      parser.banner = HELP_BANNER
+      parser.separator ""
+      parser.on("-h", "--help", HELP_DESCRIPTION) do
+        puts parser
+        exit(true)
+      end
+      parser.on("-c", "--config config_file_path", CONFIG_DESCRIPTION) do |config_path|
+        options[:config_file_path] = config_path
+      end
+    end.parse!
+  end
+end
+
+def main
+  options = parse_options
+  DockerClone.new(options).clone_repos
+rescue StandardError => error
+  puts error.message
+end
+
+main
