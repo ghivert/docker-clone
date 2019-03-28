@@ -87,14 +87,28 @@ You can also use a programmatic access. Add the `docker-clone` gem to your `Gemf
 run a `bundle install`, and you can `require "docker-clone"` directly into your
 Ruby files. It gives access to a `DockerClone` object.
 
-The object must be initialized with a path to the config file. Then, run `clone_repos`
-and it will install everything.
+The object must be initialized with an options map, with `working_dir` and
+`config_file_path`. Then, run `clone_repos` and it will install everything.
 
 ```ruby
 require "docker_clone"
 
-# initialize the object. It reads the config file during initialization.
-cloner = DockerClone.new(path_to_file)
+# Folder structure
+# workspace
+# └── docker-cloner
+#     ├── .git/
+#     ├── .gitignore
+#     ├── docker-clone.yml
+#     ├── docker-compose.yml
+#     └── README.md
+
+# Initialize the object. It reads the config file during initialization.
+cloner = DockerClone.new(
+  working_dir: '../',
+  # working_dir will be expanded to the workspace directory.
+  config_file_path: './docker-clone.yml'
+  # config_file_path will be expanded to docker-clone.yml in the root directory.
+)
 # And clone the repos!
 clone.clone_repos
 ```
@@ -102,4 +116,4 @@ clone.clone_repos
 # Contributions
 
 Do you love the package? Love the utility? Want to improve it? PR are welcome, as
-well as issues.
+well as issues!
